@@ -208,6 +208,20 @@ $("sender").addEventListener("change", render);
 $("to-top").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 $("to-bottom").addEventListener("click", () => window.scrollTo({ top: document.scrollingElement.scrollHeight, behavior: "smooth" }));
 
+// ---- ordering ----
+// The protocol allows ordering by array position or by created_at. A chat
+// timeline wants chronological order: the app merges two id spaces (the
+// event log and the legacy message table), so delivery order can differ
+// from time order, and a message can also arrive both in init and live.
+// Sort stably by created_at (arrival order breaks ties) and dedupe by id.
+
+function sortByTime() {
+  messages = messages
+    .map((m, i) => [m, i])
+    .sort((a, b) => ((Date.parse(a[0].created_at) || 0) - (Date.parse(b[0].created_at) || 0)) || (a[1] - b[1]))
+    .map((pair) => pair[0]);
+}
+
 // ---- app connection ----
 
 connect({
@@ -215,15 +229,18 @@ connect({
     $("team").textContent = team;
     memberNames = list.map((x) => x.name);
     messages = initial.slice(-MAX_SHOWN);
+    sortByTime();
     firstSpeaker = messages.length ? messages[0].from : null;
     refreshSenderOptions();
     render();
     window.scrollTo({ top: document.scrollingElement.scrollHeight });
   },
   onMessage(m) {
+    if (messages.some((x) => x.id === m.id)) return; // already shown (init + live overlap)
     messages.push(m);
-    if (messages.length > MAX_SHOWN) messages.shift();
-    if (firstSpeaker === null) firstSpeaker = m.from;
+    sortByTime();
+    if (messages.length > MAX_SHOWN) messages.splice(0, messages.length - MAX_SHOWN);
+    if (firstSpeaker === null) firstSpeaker = messages[0].from;
     refreshSenderOptions();
     render();
   },
