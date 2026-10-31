@@ -13,6 +13,11 @@ add-on brings the same reading experience into the app itself: it runs in the
 app's sandboxed add-on pane and receives only the messages the user grants it.
 No database access, no program execution, no operating agmsg.
 
+![The Chat viewer pane running in the agmsg app](screenshot.png)
+
+*The pane running in the real agmsg app 0.6.0 (debug build), showing a dummy
+team — see "Verified" below.*
+
 ## What it looks like
 
 Picture the standalone viewer's chat screen, shrunk into one app pane:
@@ -74,6 +79,21 @@ pane is open.
   view.
 - This is a viewer: it cannot send messages or operate agmsg, by design of
   the add-on sandbox.
+
+## Verified
+
+Verified end-to-end in the real app on 2026-10-31: agmsg `app-v0.6.0` was
+built from source (debug build) and run under Xvfb on Linux, this add-on was
+loaded via Developer → Load from folder, `messages:read` was granted, and the
+pane rendered a synthetic team's conversation (dummy members only) — including
+live delivery of messages sent while the pane was open. One honest caveat:
+stock 0.6.0 enables add-ons only on macOS/Windows (its startup gate refuses
+other platforms by policy), so the Linux run waived exactly that one policy
+line in a local copy of the app; every isolation probe the gate also checks
+(CSP enforcement, opaque origin, navigation refusal, WebRTC absence) ran and
+passed unmodified on WebKitGTK. On macOS/Windows no waiver is involved.
+That run also caught a real bug — messages could render out of time order —
+fixed by sorting the timeline by `created_at` (see git history).
 
 ## Development
 
