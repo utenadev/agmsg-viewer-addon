@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat viewer</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="toolbar">
+    <div class="title-row">
+      <h1 id="team">Chat viewer</h1>
+      <p id="status">Waiting for the app…</p>
+      <span class="spacer"></span>
+      <button id="to-top" type="button" class="nav-btn">↑ Top</button>
+      <button id="to-bottom" type="button" class="nav-btn">↓ Bottom</button>
+    </div>
+    <div class="filter-row">
+      <input id="search" type="search" placeholder="Search messages…" aria-label="Search messages">
+      <select id="sender" aria-label="Filter by sender">
+        <option value="">All senders</option>
+      </select>
+    </div>
+  </header>
+  <main id="chat" class="chat" aria-live="off"></main>
+  <footer class="foot">
+    <p>agmsg-viewer add-on · newest 500 messages from the app · filters live only while this pane is open</p>
+  </footer>
+</body>
+</html>
